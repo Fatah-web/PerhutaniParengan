@@ -169,7 +169,6 @@ $html = '
     <th width="10%">Rencana Tanam</th>
     <th width="10%">Jenis Tanaman</th>
     <th width="8%">Jarak Tanam</th>
-    <th width="10%">Jumlah Lubang</th>
     <th width="10%">Mandor</th>
 </tr>
 </thead>
