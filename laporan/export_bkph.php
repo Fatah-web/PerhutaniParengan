@@ -178,10 +178,6 @@ $html = '
     <td>'.htmlspecialchars($bkph['jarak_tanam'] ?? '-').'</td>
 </tr>
 
-<tr>
-    <td>Jumlah Lubang</td>
-    <td>'.htmlspecialchars($bkph['jumlah_lubang'] ?? '-').'</td>
-</tr>
 
 <tr>
     <td>Mandor</td>

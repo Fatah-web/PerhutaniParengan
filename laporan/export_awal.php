@@ -25,7 +25,6 @@ $query = mysqli_query($conn, "
         b.luas_baku,
         b.jenis_tanaman,
         b.jarak_tanam,
-        b.jumlah_lubang,
         m.nama AS nama_mandor
     FROM data_awal da
     LEFT JOIN bkph b ON da.bkph_id = b.bkph_id
@@ -170,10 +169,6 @@ $html = '
     <td>'.htmlspecialchars($data['jarak_tanam'] ?? '-').'</td>
 </tr>
 
-<tr>
-    <td>Jumlah Lubang</td>
-    <td>'.htmlspecialchars($data['jumlah_lubang'] ?? '-').'</td>
-</tr>
 
 <tr>
     <td>Mandor</td>

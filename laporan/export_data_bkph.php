@@ -189,7 +189,6 @@ while ($row = mysqli_fetch_assoc($query)) {
         <td>'.htmlspecialchars($row['rencana_tanam'] ?? '-').'</td>
         <td>'.htmlspecialchars($row['jenis_tanaman'] ?? '-').'</td>
         <td>'.htmlspecialchars($row['jarak_tanam'] ?? '-').'</td>
-        <td>'.htmlspecialchars($row['jumlah_lubang'] ?? '-').'</td>
         <td>'.htmlspecialchars($row['nama_mandor'] ?? '-').'</td>
     </tr>
     ';

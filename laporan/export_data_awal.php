@@ -26,7 +26,6 @@ $sql = "
         b.luas_baku,
         b.jenis_tanaman,
         b.jarak_tanam,
-        b.jumlah_lubang,
         m.nama AS nama_mandor
     FROM data_awal da
     LEFT JOIN bkph b ON da.bkph_id = b.bkph_id
@@ -210,7 +209,6 @@ while ($row = mysqli_fetch_assoc($query)) {
         <td>'.htmlspecialchars($row['luas_baku'] ?? '-').'</td>
         <td>'.htmlspecialchars($row['jenis_tanaman'] ?? '-').'</td>
         <td>'.htmlspecialchars($row['jarak_tanam'] ?? '-').'</td>
-        <td>'.htmlspecialchars($row['jumlah_lubang'] ?? '-').'</td>
         <td>'.htmlspecialchars($row['nama_mandor'] ?? '-').'</td>
     </tr>
     ';
