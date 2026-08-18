@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// ✅ Cek apakah session adaaaaaaaaaaaaa
+// ✅ Cek apakah session adha
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== "admin") {
   header("location:../index.php");
   exit();
