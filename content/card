@@ -1,0 +1,71 @@
+
+<?php
+// 🔹 Hitung total per jenis simpanan
+$total_pokok = $total_wajib = $total_sukarela = 0;
+$qtotal = mysqli_query($conn, "SELECT * FROM simpan");
+while ($t = mysqli_fetch_array($qtotal)) {
+  if ($t['tipe_transaksi'] == 'setor') {
+    if ($t['jenis_simpanan'] == 'pokok') $total_pokok += $t['jumlah'];
+    if ($t['jenis_simpanan'] == 'wajib') $total_wajib += $t['jumlah'];
+    if ($t['jenis_simpanan'] == 'sukarela') $total_sukarela += $t['jumlah'];
+  } elseif ($t['tipe_transaksi'] == 'tarik') {
+    if ($t['jenis_simpanan'] == 'pokok') $total_pokok -= $t['jumlah'];
+    if ($t['jenis_simpanan'] == 'wajib') $total_wajib -= $t['jumlah'];
+    if ($t['jenis_simpanan'] == 'sukarela') $total_sukarela -= $t['jumlah'];
+  }
+}
+$total_keseluruhan = $total_pokok + $total_wajib + $total_sukarela;
+?>
+<div class="col d-flex align-items-stretch">
+  <div class="card w-100 border-0 shadow-lg rounded-4">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-4 text-primary text-center">
+        <i class="bi bi-piggy-bank-fill me-2"></i> Ringkasan Total Simpanan
+      </h5>
+
+      <div class="row g-4">
+        <!-- Simpanan Pokok -->
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4" 
+               style="background: linear-gradient(135deg, #364768ff, #6a7c97ff); color: #fff;">
+            <div class="card-body text-center p-4">
+              <div class="mb-2"><i class="bi bi-person-badge fs-3 text-light"></i></div>
+              <h6 class="fw-semibold text-light mb-1">Simpanan Pokok</h6>
+              <h5 class="fw-bold mb-0">Rp <?= number_format($total_pokok, 2, ',', '.') ?></h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simpanan Wajib -->
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4" 
+               style="background: linear-gradient(135deg,  #8e2de2, #4a00e0); color: #fff;">
+            <div class="card-body text-center p-4">
+              <div class="mb-2"><i class="bi bi-check2-circle fs-3 text-light"></i></div>
+              <h6 class="fw-semibold text-light mb-1">Simpanan Wajib</h6>
+              <h5 class="fw-bold mb-0">Rp <?= number_format($total_wajib, 2, ',', '.') ?></h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simpanan Sukarela -->
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm rounded-4" 
+               style="background: linear-gradient(135deg, #c6a174ff, #e07400ff); color: #fff;">
+            <div class="card-body text-center p-4">
+              <div class="mb-2"><i class="bi bi-heart-fill fs-3 text-light"></i></div>
+              <h6 class="fw-semibold text-light mb-1">Simpanan Sukarela</h6>
+              <h5 class="fw-bold mb-0">Rp <?= number_format($total_sukarela, 2, ',', '.') ?></h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Keseluruhan -->
+      <div class="card border-0 shadow-sm rounded-4 mt-4" 
+           style="background: linear-gradient(135deg, #5893ecff, #0a58ca); color: #fff;">
+        <div class="card-body text-center p-4">
+          <h6 class="fw-semibold mb-2"><i class="bi bi-cash-stack me-2"></i> Total Keseluruhan</h6>
+          <h4 class="fw-bold mb-0">Rp <?= number_format($total_keseluruhan, 2, ',', '.') ?></h4>
+        </div>
+      </div>

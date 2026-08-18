@@ -1,0 +1,84 @@
+/* Style umum tombol */
+.btne {
+  display: inline-block;
+  padding: 5px 8px;
+  border: 2px solid transparent; /* border hitam */
+  background-color: transparent; /* putih */
+  color: #5f5f5f; /* teks hitam */
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+/* Bikin kolom aksi sekecil mungkin */
+.aksi-col {
+  width: 1% !important;
+  white-space: nowrap;
+}
+
+/* Tambahan biar isi kolom ga maksa lebar */
+.aksi-col .btn {
+  width: auto !important;
+  min-width: unset !important;
+}
+
+/* Tombol Edit */
+.btn-edit {
+  /* Hijau */
+  background-color: #f8c076;
+  border: 2px solid transparent;
+  color: #353535;
+}
+
+.btn-edit:hover {
+  background-color: #f9c98b;
+  color: #353535; /* kebalik: jadi hitam dengan teks putih */
+}
+
+/* Tombol Hapus */
+.btn-hapus {
+  background-color: #fb977d;
+  border: 2px solid transparent;
+  color: #ffffff;
+}
+
+.btn-hapus:hover {
+  background-color: #d5806a;
+  color: #ffffff;
+}
+
+.btn-detail {
+  background-color: #0085db;
+  border: 2px solid transparent;
+  color: #fff;
+}
+
+.btn-detail:hover {
+  background-color: #0071ba;
+  color: #fff;
+}
+
+#preview {
+  display: block;
+  width: 130px;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+.sidebar-nav ul .sidebar-item .sidebar-link.active {
+  color: #28a745 !important;
+}
+
+.primary-hover-bg:hover {
+  color: #28a745 !important;
+}
+
+.primary-hover-bg.active {
+  color: #28a745 !important;
+}
+
+.primary-hover-bg::before {
+  background-color: #d4f5df !important;
+}
