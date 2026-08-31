@@ -14,13 +14,12 @@ if ($aksi == 'simpan') {
     $rencana_tanam  = $_POST['rencana_tanam'];
     $jenis_tanaman  = $_POST['jenis_tanaman'];
     $jarak_tanam    = $_POST['jarak_tanam'];
-    $jumlah_lubang  = $_POST['jumlah_lubang'];
     $mandor_id      = $_POST['mandor_id'];
 
     $query = "INSERT INTO bkph 
-        (nama_bkph, rph, petak, luas_baku, rencana_tanam, jenis_tanaman, jarak_tanam, jumlah_lubang, mandor_id)
+        (nama_bkph, rph, petak, luas_baku, rencana_tanam, jenis_tanaman, jarak_tanam, mandor_id)
         VALUES
-        ('$nama_bkph', '$rph', '$petak', '$luas_baku', '$rencana_tanam', '$jenis_tanaman', '$jarak_tanam', '$jumlah_lubang', '$mandor_id')";
+        ('$nama_bkph', '$rph', '$petak', '$luas_baku', '$rencana_tanam', '$jenis_tanaman', '$jarak_tanam', '$mandor_id')";
 
     if (mysqli_query($conn, $query)) {
         $_SESSION['flash'] = [
@@ -52,7 +51,6 @@ elseif ($aksi == 'edit') {
     $rencana_tanam  = $_POST['rencana_tanam'];
     $jenis_tanaman  = $_POST['jenis_tanaman'];
     $jarak_tanam    = $_POST['jarak_tanam'];
-    $jumlah_lubang  = $_POST['jumlah_lubang'];
     $mandor_id      = $_POST['mandor_id'];
 
     $query = "UPDATE bkph SET
@@ -63,7 +61,6 @@ elseif ($aksi == 'edit') {
                 rencana_tanam = '$rencana_tanam',
                 jenis_tanaman = '$jenis_tanaman',
                 jarak_tanam   = '$jarak_tanam',
-                jumlah_lubang = '$jumlah_lubang',
                 mandor_id     = '$mandor_id'
               WHERE bkph_id = '$bkph_id'";
 
