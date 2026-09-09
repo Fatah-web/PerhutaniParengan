@@ -119,6 +119,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Plus Jakarta Sans, sans-serif",
 
             foreColor: "#c6d1e9",
+            // ======================================
+            // ANIMASI CHART
+            // ======================================
+            animations: {
+                enabled: true,
+                easing: "easeinout",
+                speed: 1400,
+                animateGradually: {
+                    enabled: true,
+                    delay: 200
+                },
+                dynamicAnimation: {
+                    enabled: true,
+                    speed: 600
+                }
+            },
 
 
             // ======================================

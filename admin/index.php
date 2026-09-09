@@ -81,7 +81,7 @@ $data = $result->fetch_assoc();
                 <span class="hide-menu">Dashboard</span>
               </a>
             </li>
-            <!---->
+            <!--
             <li class="sidebar-item">
               <a class="sidebar-link primary-hover-bg" href="./index.php?p=pemberitahuan" aria-expanded="false">
                 <iconify-icon icon="solar:bell-bing-bold-duotone"></iconify-icon>
@@ -93,19 +93,19 @@ $data = $result->fetch_assoc();
                 <iconify-icon icon="solar:rocket-bold-duotone"></iconify-icon>
                 <span class="hide-menu">Target</span>
               </a>
-            </li>
+            </li>-->
             <li class="sidebar-item">
               <a class="sidebar-link primary-hover-bg" href="./index.php?p=progres" aria-expanded="false">
                 <iconify-icon icon="solar:graph-up-bold-duotone"></iconify-icon>
                 <span class="hide-menu">Progres</span>
               </a>
-            </li>
+            </li><!--
             <li class="sidebar-item">
               <a class="sidebar-link primary-hover-bg" href="./index.php?p=analisis" aria-expanded="false">
                 <iconify-icon icon="solar:chart-2-bold-duotone"></iconify-icon>
                 <span class="hide-menu">Analisis</span>
               </a>
-            </li>
+            </li>-->
             <li class="nav-small-cap text-muted px-3 mt-3">
               <span class="fw-bold">DATA</span>
             </li>
