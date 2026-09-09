@@ -14,28 +14,44 @@ if ($aksi == 'simpan') {
     $tanggal       = $_POST['tanggal'];
     $catatan       = $_POST['catatan'];
     $data_awal_id  = $_POST['data_awal_id'];
+
+    // Cek apakah Data Awal sudah memiliki data lubang
+    $cek = mysqli_query($conn, "SELECT * FROM lubang WHERE data_awal_id = '$data_awal_id'");
+
+    if (mysqli_num_rows($cek) > 0) {
+
+        $_SESSION['flash'] = [
+            'icon'  => 'error',
+            'title' => 'Gagal',
+            'text'  => 'Data lubang untuk data awal tersebut sudah ada.'
+        ];
+
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
+
     $foto = upload();
 
-    $query = "INSERT INTO lubang 
+    $query = "INSERT INTO lubang
                 (jumlah_lubang, foto_lokasi, tanggal, catatan, data_awal_id)
               VALUES
                 ('$jumlah_lubang', '$foto', '$tanggal', '$catatan', '$data_awal_id')";
 
     if (mysqli_query($conn, $query)) {
         $_SESSION['flash'] = [
-            'icon' => 'success',
+            'icon'  => 'success',
             'title' => 'Berhasil',
-            'text' => 'Data lubang berhasil disimpan'
+            'text'  => 'Data lubang berhasil disimpan.'
         ];
     } else {
         $_SESSION['flash'] = [
-            'icon' => 'error',
+            'icon'  => 'error',
             'title' => 'Gagal',
-            'text' => 'Data lubang gagal disimpan'
+            'text'  => 'Data lubang gagal disimpan.'
         ];
     }
 
-     header("Location: " . $_SERVER['HTTP_REFERER']);
+    header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
 }
 
@@ -43,7 +59,7 @@ if ($aksi == 'simpan') {
 /* ===========================
    EDIT DATA LUBANG
 =========================== */
- elseif ($aksi == 'edit') {
+elseif ($aksi == 'edit') {
 
     $lubang_id     = $_POST['lubang_id'];
     $jumlah_lubang = $_POST['jumlah_lubang'];
@@ -51,13 +67,32 @@ if ($aksi == 'simpan') {
     $catatan       = $_POST['catatan'];
     $data_awal_id  = $_POST['data_awal_id'];
     $fotolama      = $_POST['fotolama'];
-    $status         = $_POST['status'];
+    $status        = $_POST['status'];
+
+    // Cek apakah Data Awal sudah digunakan oleh data lain
+    $cek = mysqli_query($conn, "
+        SELECT * FROM lubang
+        WHERE data_awal_id = '$data_awal_id'
+        AND lubang_id != '$lubang_id'
+    ");
+
+    if (mysqli_num_rows($cek) > 0) {
+
+        $_SESSION['flash'] = [
+            'icon'  => 'error',
+            'title' => 'Gagal',
+            'text'  => 'Data lubang untuk data awal tersebut sudah ada.'
+        ];
+
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
 
     // cek upload foto baru
     if ($_FILES['foto']['error'] === 4) {
         $foto_lokasi = $fotolama;
     } else {
-        if (file_exists('../gambar_lubang/' . $fotolama)) {
+        if ($fotolama != "" && file_exists('../gambar_lubang/' . $fotolama)) {
             unlink('../gambar_lubang/' . $fotolama);
         }
         $foto_lokasi = upload();
@@ -68,37 +103,37 @@ if ($aksi == 'simpan') {
                 foto_lokasi   = '$foto_lokasi',
                 tanggal       = '$tanggal',
                 catatan       = '$catatan',
-                status       = '$status',
+                status        = '$status',
                 data_awal_id  = '$data_awal_id'
               WHERE lubang_id = '$lubang_id'";
 
     if (mysqli_query($conn, $query)) {
         $_SESSION['flash'] = [
-            'icon' => 'success',
+            'icon'  => 'success',
             'title' => 'Berhasil',
-            'text' => 'Data lubang berhasil diedit'
+            'text'  => 'Data lubang berhasil diedit.'
         ];
     } else {
         $_SESSION['flash'] = [
-            'icon' => 'error',
+            'icon'  => 'error',
             'title' => 'Gagal',
-            'text' => 'Data lubang gagal diedit'
+            'text'  => 'Data lubang gagal diedit.'
         ];
     }
 
-     header("Location: " . $_SERVER['HTTP_REFERER']);
+    header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
 }
 
 
 /* ===========================
    HAPUS DATA LUBANG
-=========================== */ 
+=========================== */
 elseif ($aksi == 'hapus') {
 
     $lubang_id = $_GET['lubang_id'];
 
-    // ambil nama foto dari database
+    // Ambil nama foto
     $q = mysqli_query($conn, "SELECT foto_lokasi FROM lubang WHERE lubang_id='$lubang_id'");
     $data = mysqli_fetch_assoc($q);
 
@@ -108,79 +143,78 @@ elseif ($aksi == 'hapus') {
         unlink('../gambar_lubang/' . $foto);
     }
 
-   if (mysqli_query($conn, "DELETE FROM lubang WHERE lubang_id='$lubang_id'"))
-    {
+    if (mysqli_query($conn, "DELETE FROM lubang WHERE lubang_id='$lubang_id'")) {
         $_SESSION['flash'] = [
-            'icon' => 'success',
+            'icon'  => 'success',
             'title' => 'Berhasil',
-            'text' => 'Data lubang berhasil dihapus'
+            'text'  => 'Data lubang berhasil dihapus.'
         ];
     } else {
         $_SESSION['flash'] = [
-            'icon' => 'error',
+            'icon'  => 'error',
             'title' => 'Gagal',
-            'text' => 'Data lubang gagal hapus'
+            'text'  => 'Data lubang gagal dihapus.'
         ];
     }
 
-     header("Location: " . $_SERVER['HTTP_REFERER']);
+    header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
-} 
+}
+
+
 /* ============================================================
-   4. VERIFIKASI lubang
+   VERIFIKASI LUBANG
 ============================================================ */
 elseif ($aksi == 'verifikasi') {
 
     $lubang_id = $_GET['lubang_id'];
 
-    $query = "
-        UPDATE lubang 
+    mysqli_query($conn, "
+        UPDATE lubang
         SET status = 'verified'
         WHERE lubang_id = '$lubang_id'
-    ";
-
-    mysqli_query($conn, $query);
+    ");
 
     $_SESSION['flash'] = [
-        'icon' => 'success',
+        'icon'  => 'success',
         'title' => 'Verifikasi Berhasil',
-        'text' => 'lubang berhasil diverifikasi!'
+        'text'  => 'Data lubang berhasil diverifikasi!'
     ];
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
+}
 
 
-    /* ============================================================
-   5. REJECT lubang
+/* ============================================================
+   REJECT LUBANG
 ============================================================ */
-} elseif ($aksi == 'reject') {
+elseif ($aksi == 'reject') {
 
-    $lubang_id   = $_POST['lubang_id'];
-    $alasan_reject = $_POST['alasan_reject'];
+    $lubang_id      = $_POST['lubang_id'];
+    $alasan_reject  = $_POST['alasan_reject'];
 
-    $query = "
-        UPDATE lubang SET 
-            status = 'rejected', 
+    mysqli_query($conn, "
+        UPDATE lubang
+        SET status = 'rejected',
             catatan = CONCAT(catatan, '\nREJECT: $alasan_reject')
         WHERE lubang_id = '$lubang_id'
-    ";
-
-    mysqli_query($conn, $query);
+    ");
 
     $_SESSION['flash'] = [
-        'icon' => 'error',
-        'title' => 'lubang Ditolak',
-        'text' => 'lubang berhasil direject!'
+        'icon'  => 'error',
+        'title' => 'Data Ditolak',
+        'text'  => 'Data lubang berhasil direject!'
     ];
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
+}
 
 
-    /* ============================================================
+/* ============================================================
    DEFAULT
 ============================================================ */
-}else {
+else {
     echo "Aksi tidak dikenali.";
 }

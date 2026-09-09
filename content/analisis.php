@@ -70,6 +70,68 @@ ORDER BY total_realisasi DESC
     const matiData = <?= json_encode($mati) ?>;
     const totalTanamData = <?= json_encode($totalTanam) ?>;
 </script>
+
+<?php
+
+// ==========================================
+// TOTAL STATISTIK TANAMAN
+// ==========================================
+
+// TOTAL TARGET
+$queryTarget = mysqli_query($conn, "
+    SELECT
+        COALESCE(SUM(da.target_pohon), 0) AS total_target
+    FROM data_awal da
+    $whereTahun
+");
+
+$dataTarget = mysqli_fetch_assoc($queryTarget);
+
+$totalTarget = (int) ($dataTarget['total_target'] ?? 0);
+
+
+// TOTAL REALISASI TANAM
+$queryRealisasi = mysqli_query($conn, "
+    SELECT
+        COALESCE(SUM(p.jumlah_tanam), 0) AS total_realisasi
+    FROM data_awal da
+
+    LEFT JOIN lubang l
+        ON da.data_awal_id = l.data_awal_id
+
+    LEFT JOIN ajir a
+        ON l.lubang_id = a.lubang_id
+
+    LEFT JOIN penanaman p
+        ON a.ajir_id = p.ajir_id
+
+    $whereTahun
+");
+
+$dataRealisasi = mysqli_fetch_assoc($queryRealisasi);
+
+$totalRealisasi = (int) ($dataRealisasi['total_realisasi'] ?? 0);
+
+
+// ==========================================
+// GAP
+// ==========================================
+
+$totalGap = max(
+    0,
+    $totalTarget - $totalRealisasi
+);
+
+?>
+<script>
+
+    const dashboardData = {
+        target: <?= $totalTarget ?>,
+        realisasi_tanam: <?= $totalRealisasi ?>,
+        gap: <?= $totalGap ?>
+    };
+
+</script>
 <?php
 /* ===== Chart Tanaman ===== */
 $queryTotal = mysqli_query($conn, "
@@ -115,7 +177,10 @@ $dataStatus = mysqli_fetch_assoc($queryStatus);
 $total_pending = (int) ($dataStatus['total_pending'] ?? 0);
 $total_verified = (int) ($dataStatus['total_verified'] ?? 0);
 $total_rejected = (int) ($dataStatus['total_rejected'] ?? 0);
+
+
 ?>
+
 <div class="col-lg-12">
     <div class="card">
         <div class="card-body py-3 px-4">
@@ -149,7 +214,7 @@ $total_rejected = (int) ($dataStatus['total_rejected'] ?? 0);
             <div class="card-body p-4">
 
                 <h5 class="fw-bold mb-3">
-                    Ranking BKPH
+                    Ranking Jumlah Tanam BKPH
                 </h5>
 
                 <!-- container scroll -->
@@ -255,69 +320,96 @@ $total_rejected = (int) ($dataStatus['total_rejected'] ?? 0);
         <div class="card overflow-hidden w-100">
             <div class="card-body p-6">
 
-                <h5 class="card-title mb-3 fw-semibold">Statistik Tanaman</h5>
+                <h5 class="card-title mb-3 fw-semibold">
+                    Statistik GAP Tanam
+                </h5>
 
                 <div class="row align-items-center">
 
                     <!-- DONUT -->
                     <div class="col-5">
                         <div class="d-flex justify-content-center">
-                            <div id="chartTanaman"></div>
+                            <div id="chartTanamanGAP"></div>
                         </div>
                     </div>
 
+
+                    <!-- INFORMASI -->
                     <div class="col-12 col-md-7">
 
-                        <!-- TOTAL TANAMAN -->
+                        <!-- TOTAL TARGET -->
                         <h2 class="fw-bold mb-1" style="font-size:38px;">
-                            <?= number_format($jumlah_tanaman ?? 0, 0, ',', '.'); ?> Pohon
+                            <?= number_format($totalTarget ?? 0, 0, ',', '.'); ?> Pohon
                         </h2>
 
-                        <p class="text-muted fs-4 mb-3">Jumlah Tanaman</p>
+                        <p class="text-muted fs-4 mb-3">
+                            Target Tanaman
+                        </p>
 
-                        <!-- PERSENTASE HIDUP -->
+
+                        <!-- PERSENTASE REALISASI -->
                         <div class="d-flex align-items-center mb-4 flex-wrap">
 
                             <span
                                 class="me-2 rounded-circle bg-light-success round-25 d-flex align-items-center justify-content-center"
-                                id="tanamanIconi" style="font-size:30px;width:42px;height:42px;">
+                                id="tanamanIconiGAP" style="font-size:30px;width:42px;height:42px;">
                             </span>
 
-                            <p class="text-success fw-bold me-2 mb-0" id="tanamanValue" style="font-size:36px;">
+                            <p class="text-success fw-bold me-2 mb-0" id="tanamanValueGAP" style="font-size:36px;">
                                 0%
                             </p>
 
-                            <p class="fs-5 text-muted mb-0">Survival Rate</p>
+                            <p class="fs-5 text-muted mb-0">
+                                Realisasi
+                            </p>
 
                         </div>
+
 
                         <!-- LEGEND -->
                         <div class="d-flex align-items-center flex-wrap gap-4">
 
-                            <!-- Pohon Hidup -->
+                            <!-- REALISASI TANAM -->
                             <div class="text-center">
+
                                 <div class="fw-bold fs-3">
-                                    <?= number_format($pohon_hidup ?? 0, 0, ',', '.'); ?>
+                                    <?= number_format($totalRealisasi ?? 0, 0, ',', '.'); ?>
                                 </div>
 
                                 <div class="d-flex align-items-center justify-content-center mt-1">
+
                                     <span class="rounded-circle me-2"
-                                        style="width:16px;height:16px;background:#00E396;"></span>
-                                    <span class="fs-3">Pohon Hidup</span>
+                                        style="width:16px;height:16px;background:#00E396;">
+                                    </span>
+
+                                    <span class="fs-3">
+                                        Realisasi Tanam
+                                    </span>
+
                                 </div>
+
                             </div>
 
-                            <!-- Pohon Mati -->
+
+                            <!-- GAP -->
                             <div class="text-center">
+
                                 <div class="fw-bold fs-3">
-                                    <?= number_format($pohon_mati ?? 0, 0, ',', '.'); ?>
+                                    <?= number_format($totalGap ?? 0, 0, ',', '.'); ?>
                                 </div>
 
                                 <div class="d-flex align-items-center justify-content-center mt-1">
+
                                     <span class="rounded-circle me-2"
-                                        style="width:16px;height:16px;background:#FF4560;"></span>
-                                    <span class="fs-3">Pohon Mati</span>
+                                        style="width:16px;height:16px;background:#FF4560;">
+                                    </span>
+
+                                    <span class="fs-3">
+                                        Gap
+                                    </span>
+
                                 </div>
+
                             </div>
 
                         </div>
@@ -329,8 +421,6 @@ $total_rejected = (int) ($dataStatus['total_rejected'] ?? 0);
             </div>
         </div>
     </div>
-
-
 
 </div>
 <div class="row">
@@ -352,603 +442,3 @@ $total_rejected = (int) ($dataStatus['total_rejected'] ?? 0);
     </div>
 
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const el = document.getElementById("chartTanam12");
-        if (!el) return;
-
-
-        // ==========================================
-        // HITUNG GAP
-        // ==========================================
-        const gapData = targetData.map((target, index) => {
-
-            const targetValue = Number(target) || 0;
-            const realisasiValue = Number(realisasiData[index]) || 0;
-
-            return Math.max(0, targetValue - realisasiValue);
-
-        });
-
-
-        // ==========================================
-        // HITUNG PERSENTASE PROGRESS
-        // ==========================================
-        const persentaseData = targetData.map((target, index) => {
-
-            const targetValue = Number(target) || 0;
-            const realisasiValue = Number(realisasiData[index]) || 0;
-
-            return targetValue > 0
-                ? Number(
-                    ((realisasiValue / targetValue) * 100).toFixed(1)
-                )
-                : 0;
-
-        });
-
-
-        // ==========================================
-        // CHART OPTIONS
-        // ==========================================
-        const options = {
-
-            // ======================================
-            // SERIES
-            // ======================================
-            series: [
-
-                // ----------------------------------
-                // TARGET
-                // ----------------------------------
-                {
-                    name: "Target Pohon",
-                    type: "column",
-                    data: targetData,
-                    group: "target"
-                },
-
-
-                // ----------------------------------
-                // REALISASI
-                // ----------------------------------
-                {
-                    name: "Realisasi Tanam",
-                    type: "column",
-                    data: realisasiData,
-                    group: "progress"
-                },
-
-
-                // ----------------------------------
-                // GAP
-                // ----------------------------------
-                {
-                    name: "Gap",
-                    type: "column",
-                    data: gapData,
-                    group: "progress"
-                },
-
-
-                // ----------------------------------
-                // LINE PROGRESS
-                // ----------------------------------
-                {
-                    name: "Progress",
-                    type: "line",
-                    data: persentaseData
-                }
-
-            ],
-
-
-            // ==========================================
-            // CHART
-            // ==========================================
-            chart: {
-                type: "line",
-                height: 480,
-                stacked: true,
-                stackOnlyBar: true,
-
-                toolbar: {
-                    show: true,
-                    offsetX: -5,
-                    offsetY: 0,
-
-                    tools: {
-                        download: true,
-                        selection: false,
-                        zoom: false,
-                        zoomin: false,
-                        zoomout: false,
-                        pan: false,
-                        reset: false
-                    }
-                },
-
-
-                animations: {
-                    enabled: true,
-                    easing: "easeinout",
-                    speed: 1000
-                }
-            },
-
-
-            // ==========================================
-            // LEGEND
-            // ==========================================
-            legend: {
-                position: "top",
-                horizontalAlign: "center",
-
-                fontSize: "12px",
-                fontWeight: 500,
-
-                labels: {
-                    colors: "#475569"
-                },
-
-                markers: {
-                    width: 9,
-                    height: 9,
-                    radius: 4
-                },
-
-                itemMargin: {
-                    horizontal: 12,
-                    vertical: 4
-                }
-            },
-
-
-            // ==========================================
-            // BAR
-            // ==========================================
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: "50%",
-                    borderRadius: 8,
-                    borderRadiusApplication: "around",
-                    borderRadiusWhenStacked: "last"
-                }
-            },
-
-            // ==========================================
-            // DATA LABEL
-            // ==========================================
-            dataLabels: {
-
-                enabled: false
-
-            },
-
-
-            // ==========================================
-            // X AXIS
-            // ==========================================
-            xaxis: {
-                categories: bkphData,
-
-                axisBorder: {
-                    show: false
-                },
-
-                axisTicks: {
-                    show: false
-                },
-
-                labels: {
-                    style: {
-                        colors: "#64748B",
-                        fontSize: "12px",
-                        fontWeight: 500
-                    }
-                }
-            },
-
-            // ==========================================
-            // Y AXIS
-            // ==========================================
-            yaxis: [
-
-                // --------------------------------------
-                // Y AXIS KIRI
-                // JUMLAH POHON
-                // --------------------------------------
-                {
-                    seriesName: [
-                        "Target Pohon",
-                        "Realisasi Tanam",
-                        "Gap"
-                    ],
-
-                    min: 0,
-
-                    labels: {
-                        style: {
-                            colors: "#64748B",
-                            fontSize: "11px"
-                        },
-
-                        formatter: function (value) {
-                            return Math.round(value)
-                                .toLocaleString("id-ID");
-                        }
-                    },
-
-                    title: {
-                        text: "Jumlah Pohon",
-                        style: {
-                            color: "#64748B",
-                            fontSize: "12px",
-                            fontWeight: 600
-                        }
-                    }
-                },
-
-                // --------------------------------------
-                // Y AXIS KANAN
-                // PERSENTASE
-                // --------------------------------------
-                {
-                    seriesName: "Progress",
-
-                    opposite: true,
-
-                    min: 0,
-                    max: 100,
-                    tickAmount: 5,
-
-                    labels: {
-                        style: {
-                            colors: "#6366F1",
-                            fontSize: "11px",
-                            fontWeight: 600
-                        },
-
-                        formatter: function (value) {
-                            return value.toFixed(0) + "%";
-                        }
-                    },
-
-                    title: {
-                        text: "Progress",
-                        style: {
-                            color: "#6366F1",
-                            fontSize: "12px",
-                            fontWeight: 600
-                        }
-                    }
-                }
-
-            ],
-
-
-            // ==========================================
-            // WARNA
-            // ==========================================
-            colors: [
-                "#60A5FA", // Target
-                "#10B981", // Realisasi
-                "#FBBF24", // Gap
-                "#6366F1"  // Progress
-            ],
-
-
-            // ==========================================
-            // STROKE
-            // ==========================================
-            stroke: {
-                width: [
-                    0,
-                    0,
-                    0,
-                    3
-                ],
-                curve: "smooth",
-                lineCap: "round"
-            },
-            states: {
-                hover: {
-                    filter: {
-                        type: "lighten",
-                        value: 0.05
-                    }
-                }
-            },
-
-
-            // ==========================================
-            // MARKER LINE
-            // ==========================================
-            markers: {
-                size: 5,
-
-                strokeWidth: 3,
-
-                strokeColors: "#ffffff",
-
-                hover: {
-                    size: 7
-                }
-            },
-
-
-
-            // ==========================================
-            // FILL
-            // ==========================================
-            fill: {
-
-                opacity: [
-                    1,
-                    1,
-                    1,
-                    1
-                ]
-
-            },
-
-
-            // ==========================================
-            // GRID
-            // ==========================================
-            grid: {
-                borderColor: "#E2E8F0",
-                strokeDashArray: 3,
-
-                padding: {
-                    top: 5,
-                    right: 15,
-                    left: 10,
-                    bottom: 5
-                },
-
-                xaxis: {
-                    lines: {
-                        show: false
-                    }
-                }
-            },
-
-
-            // ==========================================
-            // TOOLTIP
-            // ==========================================
-
-            // ======================================
-            // TOOLTIP
-            // ======================================
-            tooltip: {
-
-                shared: false,
-
-                intersect: true,
-
-                custom: function ({
-                    dataPointIndex
-                }) {
-
-                    const target =
-                        Number(targetData[dataPointIndex]) || 0;
-
-                    const realisasi =
-                        Number(realisasiData[dataPointIndex]) || 0;
-
-                    const gap =
-                        Math.max(0, target - realisasi);
-
-                    const persentase =
-                        target > 0
-                            ? ((realisasi / target) * 100).toFixed(1)
-                            : "0.0";
-
-                    const bkph =
-                        bkphData[dataPointIndex] ?? "-";
-
-
-                    return `
-                    <div style="
-                        width: 250px;
-                        padding: 14px 16px;
-                        background: #ffffff;
-                        border: 1px solid #e5e7eb;
-                        border-radius: 10px;
-                        box-shadow:
-                            0 8px 24px
-                            rgba(15, 23, 42, 0.12);
-                        font-family: inherit;
-                    ">
-
-                        <div style="
-                            display:flex;
-                            justify-content:space-between;
-                            align-items:center;
-                            margin-bottom:12px;
-                        ">
-
-                            <div>
-                                <div style="
-                                    font-size:10px;
-                                    color:#94a3b8;
-                                    margin-bottom:2px;
-                                ">
-                                    LOKASI
-                                </div>
-
-                                <div style="
-                                    font-size:14px;
-                                    font-weight:700;
-                                    color:#1e293b;
-                                ">
-                                    ${bkph}
-                                </div>
-                            </div>
-
-                            <div style="
-                                padding:5px 9px;
-                                border-radius:6px;
-                                background:#f5f3ff;
-                                color:#7c3aed;
-                                font-size:11px;
-                                font-weight:700;
-                            ">
-                                ${persentase}%
-                            </div>
-
-                        </div>
-
-
-                        <div style="
-                            border-top:1px solid #f1f5f9;
-                            padding-top:10px;
-                        ">
-
-                            <!-- TARGET -->
-                            <div style="
-                                display:flex;
-                                justify-content:space-between;
-                                margin-bottom:8px;
-                            ">
-
-                                <span style="
-                                    font-size:12px;
-                                    color:#64748b;
-                                ">
-                                    🔵 Target Pohon
-                                </span>
-
-                                <strong style="
-                                    font-size:13px;
-                                    color:#1e293b;
-                                ">
-                                    ${target.toLocaleString("id-ID")}
-                                </strong>
-
-                            </div>
-
-
-                            <!-- REALISASI -->
-                            <div style="
-                                display:flex;
-                                justify-content:space-between;
-                                margin-bottom:8px;
-                            ">
-
-                                <span style="
-                                    font-size:12px;
-                                    color:#64748b;
-                                ">
-                                    🟢 Realisasi Tanam
-                                </span>
-
-                                <strong style="
-                                    font-size:13px;
-                                    color:#1e293b;
-                                ">
-                                    ${realisasi.toLocaleString("id-ID")}
-                                </strong>
-
-                            </div>
-
-
-                            <!-- GAP -->
-                            <div style="
-                                display:flex;
-                                justify-content:space-between;
-                                padding-top:8px;
-                                border-top:1px dashed #e2e8f0;
-                            ">
-
-                                <span style="
-                                    font-size:12px;
-                                    color:#64748b;
-                                ">
-                                    🟠 Gap
-                                </span>
-
-                                <strong style="
-                                    font-size:13px;
-                                    color:#d97706;
-                                ">
-                                    ${gap.toLocaleString("id-ID")}
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- PROGRESS -->
-                        <div style="
-                            margin-top:13px;
-                        ">
-
-                            <div style="
-                                display:flex;
-                                justify-content:space-between;
-                                margin-bottom:5px;
-                            ">
-
-                                <span style="
-                                    font-size:10px;
-                                    color:#94a3b8;
-                                ">
-                                    Progress
-                                </span>
-
-                                <strong style="
-                                    font-size:10px;
-                                    color:#7c3aed;
-                                ">
-                                    ${persentase}%
-                                </strong>
-
-                            </div>
-
-                            <div style="
-                                height:5px;
-                                width:100%;
-                                background:#e2e8f0;
-                                border-radius:10px;
-                                overflow:hidden;
-                            ">
-
-                                <div style="
-                                    height:100%;
-                                    width:${Math.min(
-                        100,
-                        Number(persentase)
-                    )}%;
-                                    background:#8B5CF6;
-                                    border-radius:10px;
-                                "></div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-                `;
-                }
-
-            }
-
-        };
-
-
-        // ==========================================
-        // RENDER
-        // ==========================================
-        const chart = new ApexCharts(el, options);
-
-        chart.render();
-
-    });
-</script>

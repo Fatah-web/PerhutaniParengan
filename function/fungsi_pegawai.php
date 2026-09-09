@@ -209,6 +209,7 @@ if ($aksi == 'simpan') {
     $user_id     = $_POST['user_id'];
     $pegawai_id  = $_POST['pegawai_id'];
     $username    = $_POST['username'];
+    $no_hp       = $_POST['no_hp'];
     $email       = $_POST['email'];
     $jabatan     = $_POST['jabatan'];
     $alamat      = $_POST['alamat'];
@@ -241,7 +242,8 @@ if ($aksi == 'simpan') {
 
     $query_pegawai = "UPDATE pegawai 
                       SET jabatan = '$jabatan',
-                          alamat = '$alamat'
+                          alamat = '$alamat',
+                          no_hp = '$no_hp'
                       WHERE pegawai_id = '$pegawai_id'";
 
     $update_users = mysqli_query($conn, $query_users);

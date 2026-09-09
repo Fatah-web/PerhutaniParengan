@@ -39,13 +39,16 @@ if (isset($_POST['login'])) {
   if (!$useTurnstile || ($responseData && $responseData->success)) {
 
     $stmt = $conn->prepare("
-    SELECT 
-        u.*,
-        m.mandor_id
-    FROM users u
-    LEFT JOIN mandor m 
-        ON u.user_id = m.user_id
-    WHERE u.username = ?
+      SELECT 
+                                u.*,
+                                m.mandor_id,
+                                p.pegawai_id
+                            FROM users u
+                            LEFT JOIN mandor m 
+                                ON u.user_id = m.user_id
+                            LEFT JOIN pegawai p
+                                ON u.user_id = p.user_id
+                            WHERE u.username = ?
 ");
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -58,6 +61,7 @@ if (isset($_POST['login'])) {
         $_SESSION['id'] = $data['user_id'];
         $_SESSION['username'] = $data['username'];
         $_SESSION['role'] = $data['role'];
+        $_SESSION['pegawai_id'] = $data['pegawai_id'] ?? null;
 
         /* Simpan mandor_id jika ada */
         if ($data['role'] === 'mandor') {

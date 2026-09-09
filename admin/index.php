@@ -45,6 +45,7 @@ $data = $result->fetch_assoc();
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
   <link rel="stylesheet" href="../assets/css/btnedit.css">
   <link rel="stylesheet" href="../assets/css/dashboardp.css">
+  <link rel="stylesheet" href="../assets/css/ccssidebar1.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&display=swap" rel="stylesheet">
 </head>
@@ -80,7 +81,8 @@ $data = $result->fetch_assoc();
                 <span class="hide-menu">Dashboard</span>
               </a>
             </li>
-           <!----><li class="sidebar-item">
+            <!---->
+            <li class="sidebar-item">
               <a class="sidebar-link primary-hover-bg" href="./index.php?p=pemberitahuan" aria-expanded="false">
                 <iconify-icon icon="solar:bell-bing-bold-duotone"></iconify-icon>
                 <span class="hide-menu">pemberitahuan</span>
@@ -183,11 +185,12 @@ $data = $result->fetch_assoc();
             <nav class="navbar navbar-expand-lg navbar-light">
 
               <ul class="navbar-nav">
-                <li class="nav-item d-block d-xl-none">
+                <li class="nav-item">
                   <a class="nav-link sidebartoggler" id="headerCollapse" href="javascript:void(0)">
                     <i class="ti ti-menu-2"></i>
                   </a>
                 </li>
+              </ul>
               </ul>
               <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                 <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
@@ -270,12 +273,15 @@ $data = $result->fetch_assoc();
       "rejected" => $rejected
     ]); ?>;
   </script>
+
   <script type="module" src="../assets/js/admin.js"></script>
   <script src="../assets/js/javav/chart-bar.js"></script>
+  <script src="../assets/js/javav/chart-donutGAP.js"></script>
   <script src="../assets/js/javav/chart-donuts2.js"></script>
   <script src="../assets/js/javav/chart-pie.js"></script>
   <script src="../assets/js/javav/image-light.js"></script>
   <script src="../assets/js/javav/swetalert-action.js"></script>
+  <script src="../assets/js/javav/chart-barGAP.js"></script>
   <script>
     var options = {
       series: [

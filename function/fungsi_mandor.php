@@ -256,7 +256,11 @@ if ($aksi == 'simpan') {
         ];
     }
 
-    header("Location: ../mandor/index.php");
+    if (!empty($_SERVER['HTTP_REFERER'])) {
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+    } else {
+        header("Location: ../mandor/index.php");
+    }
     exit();
 } else {
     echo "Aksi tidak dikenali.";

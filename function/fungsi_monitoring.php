@@ -10,14 +10,32 @@ $aksi = $_GET['aksi'] ?? '';
 =========================== */
 if ($aksi == 'simpan') {
 
-    $jumlah_hidup   = $_POST['jumlah_hidup'];
-    $jumlah_mati    = $_POST['jumlah_mati'];
+    $jumlah_hidup    = $_POST['jumlah_hidup'];
+    $jumlah_mati     = $_POST['jumlah_mati'];
     $tinggi_diameter = $_POST['tinggi_diameter'];
-    $gangguan       = $_POST['gangguan'];
-    $tanggal        = $_POST['tanggal'];
-    $evaluasi       = $_POST['evaluasi'];
-    $catatan        = $_POST['catatan'];
-    $tanam_id       = $_POST['tanam_id'];
+    $gangguan        = $_POST['gangguan'];
+    $tanggal         = $_POST['tanggal'];
+    $evaluasi        = $_POST['evaluasi'];
+    $catatan         = $_POST['catatan'];
+    $tanam_id        = $_POST['tanam_id'];
+
+    // Cek apakah penanaman sudah memiliki monitoring
+    $cek = mysqli_query($conn, "
+        SELECT * FROM monitoring
+        WHERE tanam_id = '$tanam_id'
+    ");
+
+    if (mysqli_num_rows($cek) > 0) {
+
+        $_SESSION['flash'] = [
+            'icon'  => 'error',
+            'title' => 'Gagal',
+            'text'  => 'Data monitoring untuk penanaman tersebut sudah ada!'
+        ];
+
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
 
     $foto_hidup = upload_hidup();
     $foto_mati  = upload_mati();
@@ -52,21 +70,41 @@ if ($aksi == 'simpan') {
 
 /* ===========================
    EDIT DATA MONITORING
-=========================== */ elseif ($aksi == 'edit') {
+=========================== */
+elseif ($aksi == 'edit') {
 
-    $monitoring_id  = $_POST['monitoring_id'];
-    $jumlah_hidup   = $_POST['jumlah_hidup'];
-    $jumlah_mati    = $_POST['jumlah_mati'];
+    $monitoring_id   = $_POST['monitoring_id'];
+    $jumlah_hidup    = $_POST['jumlah_hidup'];
+    $jumlah_mati     = $_POST['jumlah_mati'];
     $tinggi_diameter = $_POST['tinggi_diameter'];
-    $gangguan       = $_POST['gangguan'];
-    $tanggal        = $_POST['tanggal'];
-    $evaluasi       = $_POST['evaluasi'];
-    $catatan        = $_POST['catatan'];
-    $tanam_id       = $_POST['tanam_id'];
-    $status         = $_POST['status'];
+    $gangguan        = $_POST['gangguan'];
+    $tanggal         = $_POST['tanggal'];
+    $evaluasi        = $_POST['evaluasi'];
+    $catatan         = $_POST['catatan'];
+    $tanam_id        = $_POST['tanam_id'];
+    $status          = $_POST['status'];
 
     $foto_hidup_lama = $_POST['foto_hidup_lama'];
     $foto_mati_lama  = $_POST['foto_mati_lama'];
+
+    // Cek apakah penanaman sudah digunakan data monitoring lain
+    $cek = mysqli_query($conn, "
+        SELECT * FROM monitoring
+        WHERE tanam_id = '$tanam_id'
+        AND monitoring_id != '$monitoring_id'
+    ");
+
+    if (mysqli_num_rows($cek) > 0) {
+
+        $_SESSION['flash'] = [
+            'icon'  => 'error',
+            'title' => 'Gagal',
+            'text'  => 'Data monitoring untuk penanaman tersebut sudah ada!'
+        ];
+
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
 
     // FOTO HIDUP
     if ($_FILES['foto_hidup']['error'] === 4) {
@@ -89,26 +127,32 @@ if ($aksi == 'simpan') {
     }
 
     $query = "UPDATE monitoring SET
-        jumlah_hidup   = '$jumlah_hidup',
-        jumlah_mati    = '$jumlah_mati',
-        tinggi_diameter= '$tinggi_diameter',
-        gangguan       = '$gangguan',
-        tanggal        = '$tanggal',
-        evaluasi       = '$evaluasi',
-        catatan        = '$catatan',
-        tanam_id       = '$tanam_id',
-        status         = '$status',
-        foto_hidup     = '$foto_hidup',
-        foto_mati      = '$foto_mati'
+        jumlah_hidup    = '$jumlah_hidup',
+        jumlah_mati     = '$jumlah_mati',
+        tinggi_diameter = '$tinggi_diameter',
+        gangguan        = '$gangguan',
+        tanggal         = '$tanggal',
+        evaluasi        = '$evaluasi',
+        catatan         = '$catatan',
+        tanam_id        = '$tanam_id',
+        status          = '$status',
+        foto_hidup      = '$foto_hidup',
+        foto_mati       = '$foto_mati'
         WHERE monitoring_id='$monitoring_id'";
 
-    mysqli_query($conn, $query);
-
-    $_SESSION['flash'] = [
-        'icon' => 'success',
-        'title' => 'Berhasil',
-        'text' => 'Data monitoring berhasil diedit'
-    ];
+    if (mysqli_query($conn, $query)) {
+        $_SESSION['flash'] = [
+            'icon' => 'success',
+            'title' => 'Berhasil',
+            'text' => 'Data monitoring berhasil diedit'
+        ];
+    } else {
+        $_SESSION['flash'] = [
+            'icon' => 'error',
+            'title' => 'Gagal',
+            'text' => 'Data monitoring gagal diedit'
+        ];
+    }
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
@@ -117,13 +161,14 @@ if ($aksi == 'simpan') {
 
 /* ===========================
    HAPUS DATA MONITORING
-=========================== */ elseif ($aksi == 'hapus') {
+=========================== */
+elseif ($aksi == 'hapus') {
 
     $monitoring_id = $_GET['monitoring_id'];
 
-    $q = mysqli_query($conn, "SELECT foto_hidup,foto_mati 
-                             FROM monitoring 
-                             WHERE monitoring_id='$monitoring_id'");
+    $q = mysqli_query($conn, "SELECT foto_hidup, foto_mati
+                              FROM monitoring
+                              WHERE monitoring_id='$monitoring_id'");
     $d = mysqli_fetch_assoc($q);
 
     if ($d['foto_hidup'] && file_exists('../gambar_monitoring/' . $d['foto_hidup'])) {
@@ -134,7 +179,19 @@ if ($aksi == 'simpan') {
         unlink('../gambar_monitoring/' . $d['foto_mati']);
     }
 
-    mysqli_query($conn, "DELETE FROM monitoring WHERE monitoring_id='$monitoring_id'");
+    if (mysqli_query($conn, "DELETE FROM monitoring WHERE monitoring_id='$monitoring_id'")) {
+        $_SESSION['flash'] = [
+            'icon' => 'success',
+            'title' => 'Berhasil',
+            'text' => 'Data monitoring berhasil dihapus'
+        ];
+    } else {
+        $_SESSION['flash'] = [
+            'icon' => 'error',
+            'title' => 'Gagal',
+            'text' => 'Data monitoring gagal dihapus'
+        ];
+    }
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
@@ -143,12 +200,13 @@ if ($aksi == 'simpan') {
 
 /* ===========================
    VERIFIKASI MONITORING
-=========================== */ elseif ($aksi == 'verifikasi') {
+=========================== */
+elseif ($aksi == 'verifikasi') {
 
     $monitoring_id = $_GET['monitoring_id'];
 
     mysqli_query($conn, "
-        UPDATE monitoring 
+        UPDATE monitoring
         SET status='verified'
         WHERE monitoring_id='$monitoring_id'
     ");
@@ -166,7 +224,8 @@ if ($aksi == 'simpan') {
 
 /* ===========================
    REJECT MONITORING
-=========================== */ elseif ($aksi == 'reject') {
+=========================== */
+elseif ($aksi == 'reject') {
 
     $monitoring_id = $_POST['monitoring_id'];
     $alasan_reject = $_POST['alasan_reject'];
@@ -186,6 +245,12 @@ if ($aksi == 'simpan') {
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
-} else {
+}
+
+
+/* ===========================
+   DEFAULT
+=========================== */
+else {
     echo "Aksi tidak dikenali.";
 }

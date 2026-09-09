@@ -16619,6 +16619,7 @@ textarea.form-control-lg {
   #main-wrapper[data-layout=vertical][data-sidebartype=full] .body-wrapper {
     margin-left: 270px;
   }
+  
 }
 @media (max-width: 1199px) {
   #main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .left-sidebar, #main-wrapper[data-layout=vertical][data-sidebartype=full] .left-sidebar {
@@ -16635,6 +16636,8 @@ textarea.form-control-lg {
     height: calc(100vh - 80px);
   }
 }
+
+
 * {
   margin: 0;
   padding: 0;
@@ -16735,3 +16738,5 @@ ul {
   width: 100%;
   line-height: 20px;
 }/*# sourceMappingURL=styles.css.map */
+
+

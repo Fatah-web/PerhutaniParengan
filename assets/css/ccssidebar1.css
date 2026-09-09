@@ -1,0 +1,13 @@
+@media (min-width: 1200px) {
+
+    /* Desktop - sidebar tertutup */
+    #main-wrapper.mini-sidebar.show-sidebar .left-sidebar {
+        left: -270px !important;
+    }
+
+    /* Desktop - sidebar terbuka */
+    #main-wrapper.mini-sidebar:not(.show-sidebar) .left-sidebar {
+        left: 0 !important;
+    }
+
+}

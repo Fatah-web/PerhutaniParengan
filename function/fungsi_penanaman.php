@@ -15,7 +15,26 @@ if ($aksi == 'simpan') {
     $tanggal      = $_POST['tanggal'];
     $catatan      = $_POST['catatan'];
     $ajir_id      = $_POST['ajir_id'];
-    $foto         = upload();
+
+    // Cek apakah Ajir sudah memiliki data penanaman
+    $cek = mysqli_query($conn, "
+        SELECT * FROM penanaman
+        WHERE ajir_id = '$ajir_id'
+    ");
+
+    if (mysqli_num_rows($cek) > 0) {
+
+        $_SESSION['flash'] = [
+            'icon'  => 'error',
+            'title' => 'Gagal',
+            'text'  => 'Data penanaman untuk ajir tersebut sudah ada!'
+        ];
+
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
+
+    $foto = upload();
 
     $query = "INSERT INTO penanaman
                 (jumlah_tanam, foto_tanam, sumber_bibit, tanggal, catatan, ajir_id)
@@ -24,15 +43,15 @@ if ($aksi == 'simpan') {
 
     if (mysqli_query($conn, $query)) {
         $_SESSION['flash'] = [
-            'icon' => 'success',
+            'icon'  => 'success',
             'title' => 'Berhasil',
-            'text' => 'Data penanaman berhasil disimpan'
+            'text'  => 'Data penanaman berhasil disimpan'
         ];
     } else {
         $_SESSION['flash'] = [
-            'icon' => 'error',
+            'icon'  => 'error',
             'title' => 'Gagal',
-            'text' => 'Data penanaman gagal disimpan'
+            'text'  => 'Data penanaman gagal disimpan'
         ];
     }
 
@@ -43,7 +62,8 @@ if ($aksi == 'simpan') {
 
 /* ===========================
    EDIT DATA PENANAMAN
-=========================== */ elseif ($aksi == 'edit') {
+=========================== */
+elseif ($aksi == 'edit') {
 
     $tanam_id     = $_POST['tanam_id'];
     $jumlah_tanam = $_POST['jumlah_tanam'];
@@ -54,7 +74,26 @@ if ($aksi == 'simpan') {
     $fotolama     = $_POST['fotolama'];
     $status       = $_POST['status'];
 
-    // cek upload foto baru
+    // Cek apakah Ajir sudah digunakan oleh data lain
+    $cek = mysqli_query($conn, "
+        SELECT * FROM penanaman
+        WHERE ajir_id = '$ajir_id'
+        AND tanam_id != '$tanam_id'
+    ");
+
+    if (mysqli_num_rows($cek) > 0) {
+
+        $_SESSION['flash'] = [
+            'icon'  => 'error',
+            'title' => 'Gagal',
+            'text'  => 'Data penanaman untuk ajir tersebut sudah ada!'
+        ];
+
+        header("Location: " . $_SERVER['HTTP_REFERER']);
+        exit();
+    }
+
+    // Cek upload foto baru
     if ($_FILES['foto']['error'] === 4) {
         $foto_tanam = $fotolama;
     } else {
@@ -76,15 +115,15 @@ if ($aksi == 'simpan') {
 
     if (mysqli_query($conn, $query)) {
         $_SESSION['flash'] = [
-            'icon' => 'success',
+            'icon'  => 'success',
             'title' => 'Berhasil',
-            'text' => 'Data penanaman berhasil diedit'
+            'text'  => 'Data penanaman berhasil diedit'
         ];
     } else {
         $_SESSION['flash'] = [
-            'icon' => 'error',
+            'icon'  => 'error',
             'title' => 'Gagal',
-            'text' => 'Data penanaman gagal diedit'
+            'text'  => 'Data penanaman gagal diedit'
         ];
     }
 
@@ -95,11 +134,12 @@ if ($aksi == 'simpan') {
 
 /* ===========================
    HAPUS DATA PENANAMAN
-=========================== */ elseif ($aksi == 'hapus') {
+=========================== */
+elseif ($aksi == 'hapus') {
 
     $tanam_id = $_GET['tanam_id'];
 
-    // ambil foto
+    // Ambil foto
     $q = mysqli_query($conn, "SELECT foto_tanam FROM penanaman WHERE tanam_id='$tanam_id'");
     $data = mysqli_fetch_assoc($q);
 
@@ -111,18 +151,17 @@ if ($aksi == 'simpan') {
 
     if (mysqli_query($conn, "DELETE FROM penanaman WHERE tanam_id='$tanam_id'")) {
         $_SESSION['flash'] = [
-            'icon' => 'success',
+            'icon'  => 'success',
             'title' => 'Berhasil',
-            'text' => 'Data Penanaman berhasil dihapus'
+            'text'  => 'Data Penanaman berhasil dihapus'
         ];
     } else {
         $_SESSION['flash'] = [
-            'icon' => 'error',
+            'icon'  => 'error',
             'title' => 'Gagal',
-            'text' => 'Data Penanaman gagal hapus'
+            'text'  => 'Data Penanaman gagal hapus'
         ];
     }
-
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
     exit();
@@ -131,22 +170,21 @@ if ($aksi == 'simpan') {
 
 /* ============================================================
    VERIFIKASI PENANAMAN
-============================================================ */ elseif ($aksi == 'verifikasi') {
+============================================================ */
+elseif ($aksi == 'verifikasi') {
 
     $tanam_id = $_GET['tanam_id'];
 
-    $query = "
-        UPDATE penanaman 
+    mysqli_query($conn, "
+        UPDATE penanaman
         SET status = 'verified'
         WHERE tanam_id = '$tanam_id'
-    ";
-
-    mysqli_query($conn, $query);
+    ");
 
     $_SESSION['flash'] = [
-        'icon' => 'success',
+        'icon'  => 'success',
         'title' => 'Verifikasi Berhasil',
-        'text' => 'Penanaman berhasil diverifikasi!'
+        'text'  => 'Penanaman berhasil diverifikasi!'
     ];
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -156,24 +194,23 @@ if ($aksi == 'simpan') {
 
 /* ============================================================
    REJECT PENANAMAN
-============================================================ */ elseif ($aksi == 'reject') {
+============================================================ */
+elseif ($aksi == 'reject') {
 
     $tanam_id      = $_POST['tanam_id'];
     $alasan_reject = $_POST['alasan_reject'];
 
-    $query = "
-        UPDATE penanaman SET 
-            status = 'rejected',
+    mysqli_query($conn, "
+        UPDATE penanaman
+        SET status = 'rejected',
             catatan = CONCAT(catatan, '\nREJECT: $alasan_reject')
         WHERE tanam_id = '$tanam_id'
-    ";
-
-    mysqli_query($conn, $query);
+    ");
 
     $_SESSION['flash'] = [
-        'icon' => 'error',
+        'icon'  => 'error',
         'title' => 'Penanaman Ditolak',
-        'text' => 'Data penanaman berhasil direject!'
+        'text'  => 'Data penanaman berhasil direject!'
     ];
 
     header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -183,6 +220,7 @@ if ($aksi == 'simpan') {
 
 /* ============================================================
    DEFAULT
-============================================================ */ else {
+============================================================ */
+else {
     echo "Aksi tidak dikenali.";
 }
