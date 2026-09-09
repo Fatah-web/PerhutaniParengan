@@ -97,5 +97,12 @@ elseif ($aksi == 'hapus') {
 
 /* ===================== AKSI TIDAK DIKENALI ===================== */
 else {
-    echo "Aksi tidak dikenali.";
+    $_SESSION['flash'] = [
+        'icon' => 'warning',
+        'title' => 'Aksi Tidak Dikenali',
+        'text' => 'Aksi yang dipilih tidak tersedia!'
+    ];
+
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
 }

@@ -211,7 +211,6 @@ if ($aksi == 'simpan') {
     $username    = $_POST['username'];
     $no_hp       = $_POST['no_hp'];
     $email       = $_POST['email'];
-    $jabatan     = $_POST['jabatan'];
     $alamat      = $_POST['alamat'];
 
     // 🔍 Cek duplikat username/email tapi abaikan milik sendiri
@@ -241,7 +240,7 @@ if ($aksi == 'simpan') {
                     WHERE user_id = '$user_id'";
 
     $query_pegawai = "UPDATE pegawai 
-                      SET jabatan = '$jabatan',
+                      SET 
                           alamat = '$alamat',
                           no_hp = '$no_hp'
                       WHERE pegawai_id = '$pegawai_id'";
@@ -272,5 +271,12 @@ if ($aksi == 'simpan') {
 
 
 } else {
-    echo "Aksi tidak dikenali.";
+    $_SESSION['flash'] = [
+        'icon' => 'warning',
+        'title' => 'Aksi Tidak Dikenali',
+        'text' => 'Aksi yang dipilih tidak tersedia!'
+    ];
+
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit();
 }
