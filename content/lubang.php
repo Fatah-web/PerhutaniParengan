@@ -19,7 +19,7 @@
         </div>
         <div class="modal fade" id="modalCetakDataAwal" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog">
-            <form action="../laporan/export_data_awal.php" method="GET" target="_blank">
+            <form action="../laporan/export_data_lubang.php" method="GET" target="_blank">
               <div class="modal-content">
 
                 <div class="modal-header bg-success text-white">
@@ -52,7 +52,7 @@
                 </div>
 
                 <div class="modal-footer">
-                  <button type="submit" class="btn btn-success">
+                  <button type="submit" class="btn btn-success" onclick="setTimeout(function(){ location.reload(); }, 800);">
                     <iconify-icon icon="solar:printer-bold-duotone"></iconify-icon>
                     Cetak PDF
                   </button>
@@ -63,7 +63,7 @@
           </div>
         </div>
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCetakDataAwal">
-          <iconify-icon icon="solar:printer-bold-duotone" height="25" style="vertical-align: -0.5em;"></iconify-icon>
+          <iconify-icon icon="solar:printer-bold-duotone" height="25" style="vertical-align: -0.5em;" ></iconify-icon>
           Cetak
         </button>
       </div>

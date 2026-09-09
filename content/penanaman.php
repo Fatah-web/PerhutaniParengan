@@ -17,7 +17,7 @@
                 </div>
                 <div class="modal fade" id="modalCetakDataAwal" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog">
-            <form action="../laporan/export_data_awal.php" method="GET" target="_blank">
+            <form action="../laporan/export_data_tanam.php" method="GET" target="_blank">
               <div class="modal-content">
 
                 <div class="modal-header bg-success text-white">
@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="modal-footer">
-                  <button type="submit" class="btn btn-success">
+                  <button type="submit" class="btn btn-success" onclick="setTimeout(function(){ location.reload(); }, 800);">
                     <iconify-icon icon="solar:printer-bold-duotone"></iconify-icon>
                     Cetak PDF
                   </button>
